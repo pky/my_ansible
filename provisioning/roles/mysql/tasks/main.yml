@@ -1,4 +1,4 @@
----
+--
 
 - name: get MySQL-shared-compat
   get_url: >

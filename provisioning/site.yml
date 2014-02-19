@@ -4,4 +4,7 @@
   roles:
     - ssh
     - ntp
+    - emacs
+    - zsh
+    - screen
     
