@@ -1,0 +1,9 @@
+- hosts: all
+  user: pky
+  sudo: true
+  roles:
+    - common
+    - nginx
+    - mysql
+    - ruby
+    - redmine

@@ -1,0 +1,8 @@
+
+- name: copy  /etc/hosts
+  copy: src=hosts dest=/etc/hosts
+  tags: hosts
+
+- name: restart network service
+  service: name=network state=restarted
+  tags: hosts

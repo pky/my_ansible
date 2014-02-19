@@ -1,0 +1,20 @@
+- name: copy zabbix-agent.conf /etc/nginx/conf.d/zabbix-agent.conf
+  copy: src=zabbix-agent.conf dest=/etc/nginx/conf.d/zabbix-agent.conf mode=644
+  tags: zabbix-nginx
+
+- name: copy nginx-params.conf /etc/zabbix/zabbix_agentd.d/nginx.conf
+  copy: src=nginx-params.conf dest=/etc/zabbix/zabbix_agentd.d/nginx.conf mode=644
+  tags: zabbix-nginx
+
+- name: copy nginx-check.sh /usr/local/bin/zabbix-nginx-check.sh
+  copy: src=nginx-check.sh dest=/usr/local/bin/zabbix-nginx-check.sh mode=755
+  tags: zabbix-nginx
+
+- name: reload nginx
+  service: name=nginx state=reloaded
+  tags: zabbix-nginx
+  
+- name: restart zabbix-agent
+  service: name=zabbix-agent state=restarted
+  tags: zabbix-nginx  
+  

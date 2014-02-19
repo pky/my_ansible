@@ -1,0 +1,12 @@
+---
+
+backup_dir: /data/backup
+db_user: root
+db_password: passwd
+parallel: 4
+comp_parallel: 4
+backup_server: YES
+bs_host: backup-server
+bs_user: root
+bs_dir: /data/backup
+

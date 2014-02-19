@@ -1,0 +1,82 @@
+---
+- name: install remi repo
+  yum: name=http://rpms.famillecollet.com/enterprise/remi-release-6.rpm state=present
+
+- name: install php
+  yum: pkg=php state=present enablerepo=remi
+
+- name: install php-fpm
+  yum: pkg=php-fpm state=present enablerepo=remi
+  
+- name: install php-mysqlnd
+  yum: pkg=php-mysqlnd state=present enablerepo=remi
+  
+- name: install php-mbstring
+  yum: pkg=php-mbstring state=present enablerepo=remi
+  
+- name: install php-bcmath
+  yum: pkg=php-bcmath state=present enablerepo=remi
+  
+- name: install php-gd
+  yum: pkg=php-gd state=present enablerepo=remi
+  
+- name: install php-xml
+  yum: pkg=php-xml state=present enablerepo=remi
+  
+- name: install php-mcrypt
+  yum: pkg=php-mcrypt state=present enablerepo=remi
+  
+- name: install php-pear
+  yum: pkg=php-pear state=present enablerepo=remi
+  
+- name: install php-devel
+  yum: pkg=php-devel state=present enablerepo=remi
+  
+- name: install pcre-devel
+  yum: pkg=pcre-devel state=present enablerepo=remi
+
+- name: install spawn-fcgi
+  yum: pkg=spawn-fcgi state=present enablerepo=epel
+
+- name: copy spawn-fcgi
+  copy: src=spawn-fcgi dest=/etc/sysconfig/spawn-fcgi
+  tags: conf
+
+
+- name: edit typezone
+  lineinfile: 
+    regexp='^date.timezone'
+    line='date.timezone = Asia/Tokyo'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+
+- name: edit post_max_size
+  lineinfile: 
+    regexp='^post_max_size'
+    line='post_max_size = 32M'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+    
+- name: edit max_input_time
+  lineinfile: 
+    regexp='^max_input_time'
+    line='max_input_time = 300'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+
+- name: edit max_execution_time
+  lineinfile: 
+    regexp='^max_execution_time'
+    line='max_execution_time = 300'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+    
+- name: start spawn-fcgi service
+  service: name=spawn-fcgi state=started enabled=yes
+
+  
+  

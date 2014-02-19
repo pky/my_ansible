@@ -1,0 +1,17 @@
+- hosts: all
+  user: pky
+  sudo: true
+  roles:
+    - iptables    
+    - common
+
+- hosts: server
+  user: pky
+  sudo: true
+  roles:
+    - mysql
+    - nginx
+    - spawn-fcgi
+    - owncloud
+    - reboot
+    

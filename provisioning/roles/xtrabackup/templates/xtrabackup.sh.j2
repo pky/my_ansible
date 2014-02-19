@@ -1,0 +1,20 @@
+#!/bin/sh
+
+BACKUPDIR={{ backup_dir }}
+TIMESTAMP=`date +'-%Y%m%d'`
+DB_USER={{ db_user }}
+DB_PASSWORD={{ db_password }}
+STREAM=xbstream
+PARALLEL={{ parallel }}
+COMP_PARALLEL={{ comp_parallel }}
+COMPRESS_TYPE=pbzip2
+FILE_PRE="xtrabackup-"
+FILE_EXT=".bz2"
+FILE_NAME=$FILE_PRE$HOSTNAME$TIMESTAMP$FILE_EXT
+
+innobackupex --user=$DB_USER --password=$DB_PASSWORD --slave-info --stream=$STREAM --parallel=$PARALLEL \
+	$BACKUPDIR | $COMPRESS_TYPE -p$COMP_PARALLEL > $BACKUPDIR/$FILE_NAME 
+
+if [ {{ backup_server }} = True ]; then
+	sudo -u {{ bs_user }} rsync -arcv --delete $BACKUPDIR/ {{ bs_user }}@{{ bs_host }}:{{ bs_dir }}/
+fi

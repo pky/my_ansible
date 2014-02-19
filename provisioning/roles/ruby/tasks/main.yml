@@ -1,0 +1,19 @@
+---
+- name: install git
+  yum: pkg=git state=present
+
+- name: copy install.sh
+  copy: src=install.sh dest=/tmp/install.sh owner=nginx group=wheel mode=775
+
+- name: install ruby
+  command: sh /tmp/install.sh ${ruby_version} creates=/usr/local/rbenv/shims/ruby
+
+- name: install bundler
+  command: /usr/local/rbenv/shims/gem install bundler creates=/usr/local/rbenv/shims/bundle
+  
+- name: rehash
+  command: /usr/local/rbenv/bin/rbenv rehash creates=/usr/local/rbenv/shims/bundle
+  sudo: no
+
+- name: source /etc/profile
+  shell: source /etc/profile

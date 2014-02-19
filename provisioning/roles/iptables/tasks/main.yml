@@ -1,0 +1,7 @@
+
+- name: copy /tmp/iptables.sh
+  copy: src=iptables.sh dest=/tmp/iptables.sh
+  tags:
+      
+- name: sh /tmp/iptables.sh
+  command: sh /tmp/iptables.sh

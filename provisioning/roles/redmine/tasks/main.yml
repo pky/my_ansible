@@ -1,0 +1,118 @@
+- name: all install
+  action: yum name=$item state=present
+  with_items:
+    - autoconf 
+    - automake 
+    - bzip2
+    - curl-devel 
+    - gcc-c++ 
+    - glibc
+    - git
+    - libxml2 
+    - libxml2-devel 
+    - libxslt 
+    - libxslt-devel
+    - make
+    - openssl-devel 
+    - patch 
+    - pcre
+    - readline 
+    - readline-devel 
+    - zlib 
+    - zlib-devel
+    - libyaml-devel
+    - ImageMagick
+    - ImageMagick-devel
+    - ipa-pgothic-fonts
+
+- name: Create Redmine database
+  mysql_db: >
+    name=${db_name}
+    state=present
+    encoding=utf8
+    login_user=root
+    login_password=${mysql_root_passwd}
+
+- name: Create redmine database user
+  mysql_user: >
+    login_user=root
+    login_password=${mysql_root_passwd}
+    priv=${db_name}.*:ALL
+    name=${db_user}
+    password=${db_password}
+
+- name: get redmine
+  get_url: >
+    url=http://www.redmine.org/releases/redmine-${redmine_version}.tar.gz
+    dest=${tmp}/redmine-${redmine_version}.tar.gz
+
+- name: tar redmine
+  command: tar xvfz redmine-${redmine_version}.tar.gz chdir=${tmp} creates=${tmp}/redmine-${redmine_version}
+
+- name: cp redmine
+  command: cp -R ${tmp}/redmine-${redmine_version} /var/lib/redmine creates=/var/lib/redmine
+  
+- name: /var/lib/redmine chown nginx:wheel
+  command: chown -R nginx:wheel /var/lib/redmine/
+
+- name: edit Gemfile
+  lineinfile: 
+    regexp="^gem 'unicorn'"
+    line="gem 'unicorn'"
+    insertafter=EOF
+    state=present
+    dest=/var/lib/redmine/Gemfile
+  
+- name: edit Gemfile
+  lineinfile: 
+    regexp="^gem 'execjs'"
+    line="gem 'execjs'"
+    insertafter=EOF
+    state=present
+    dest=/var/lib/redmine/Gemfile
+
+- name: edit Gemfile
+  lineinfile: 
+    regexp="^gem 'therubyracer'"
+    line="gem 'therubyracer'"
+    insertafter=EOF
+    state=present
+    dest=/var/lib/redmine/Gemfile
+    
+- name: edit config/application.rb
+  lineinfile: 
+    regexp="^I18n.enforce_available_locales"
+    line="I18n.enforce_available_locales = true"
+    insertafter=EOF
+    state=present
+    dest=/var/lib/redmine/config/application.rb
+
+- name: cp config/unicorn_redmine.rb
+  copy: src=unicorn_redmine.rb dest=/var/lib/redmine/config/unicorn_redmine.rb
+
+- name: cp config/database.yml
+  copy: src=database.yml dest=/var/lib/redmine/config/database.yml mode=666
+
+- name: set log dir
+  file: path=/var/lib/redmine/log owner=nginx group=wheel state=directory mode=777
+
+- name: set tmp dir
+  file: path=/var/lib/redmine/tmp owner=nginx group=wheel state=directory mode=777
+
+- name: chmod 666 log/production.log
+  file: path=/var/lib/redmine/log/production.log owner=nginx group=wheel state=directory mode=666
+
+- name: mkdir /var/log/unicorn
+  file: path=/var/log/unicorn owner=nginx group=wheel state=directory mode=775
+
+- name: copy nginx redmine.conf
+  copy: src=redmine.conf dest=/etc/nginx/conf.d/redmine.conf
+  tags: conf
+
+- name: install bundler
+  shell: >
+    source /etc/profile;
+    cd /var/lib/redmine;
+    /usr/local/rbenv/shims/bundle install --path vendor/bundle;
+    /usr/local/rbenv/shims/bundle exec rake generate_secret_token;
+    RAILS_ENV=production /usr/local/rbenv/shims/bundle exec rake db:migrate

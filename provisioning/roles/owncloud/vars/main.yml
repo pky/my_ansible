@@ -1,0 +1,9 @@
+---
+
+db_user: owncloud
+db_name: owncloud
+db_password: owncloud_password
+server_name: pky.jp
+
+
+

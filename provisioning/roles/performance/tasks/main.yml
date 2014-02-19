@@ -1,0 +1,105 @@
+
+- name: install libselinux-python
+  yum: name=libselinux-python
+
+- name: selinux desabled
+  selinux: state=disabled
+
+- name: set kernel.panic_on_oops
+  sysctl: name=kernel.panic_on_oops value=1 state=present  
+  
+- name: set kernel.panic
+  sysctl: name=kernel.panic value=1 state=present  
+  
+- name: set vm.swappiness
+  sysctl: name=vm.swappiness value=0 state=present  
+  
+- name: net.core.rmem_max = 16777216
+  sysctl: name=net.core.rmem_max value=16777216 state=present
+ 
+- name: set net.ipv4.tcp_rmem
+  sysctl: name=net.ipv4.tcp_rmem value="4096 87380 16777216" state=present
+ 
+- name: set net.ipv4.tcp_wmem
+  sysctl: name=net.ipv4.tcp_wmem value="4096 65536 16777216" state=present
+
+- name: set overcommit_memory=1
+  sysctl: name=vm.overcommit_memory value=1 state=present
+
+- name: set net.nf_conntrack_max = 1000000
+  sysctl: name=net.nf_conntrack_max value=1000000 state=present
+
+- name: net.ipv4.ip_local_port_range = 32768 65000
+  sysctl: name=net.ipv4.ip_local_port_range value="32768 65000" state=present
+
+- name: set kernel.msgmax
+  sysctl: name=kernel.msgmax value=65536 state=present
+ 
+- name: set kernel.msgmnb
+  sysctl: name=kernel.msgmnb value=65536 state=present
+ 
+- name: set kernel.shmmax
+  sysctl: name=kernel.shmmax value=68719476736 state=present
+ 
+- name: set kernel.shmall
+  sysctl: name=kernel.shmall value=4294967296 state=present reload=yes
+
+- name: copy /etc/security/limits.d/90-nproc.conf
+  copy: src=90-nproc.conf dest=/etc/security/limits.d/90-nproc.conf
+
+  
+
+- name: add ulimit -u /etc/sysconfig/init
+  lineinfile: dest=/etc/sysconfig/init
+              regexp="ulimit -u"
+              value="ulimit -u 65535"
+              insertafter=EOF
+              state=present
+
+- name: add ulimit -n /etc/sysconfig/init
+  lineinfile: dest=/etc/sysconfig/init
+              regexp="ulimit -n"
+              value="ulimit -n 65535"
+              insertafter=EOF
+              state=present
+
+- name: user add wheel group
+  command: usermod -G wheel ${user}
+  
+- name: edit /etc/pam.d/su
+  lineinfile: dest=/etc/pam.d/su
+              regexp="#auth\s+required\s+pam_wheel.so use_uid"
+              value="auth required pam_wheel.so use_uid"
+              insertafter=EOF
+              state=present
+              
+- name: check epel repository is installed
+  shell: rpm -q epel-release > /dev/null; echo $?
+  register: result
+  changed_when: False
+
+- name: install epel repository
+  yum: name=http://ftp.riken.jp/Linux/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm state=present
+
+- name: install epel key
+  command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+
+- name: all install
+  action: yum name=$item state=present
+  with_items:
+    - autoconf 
+    - automake 
+    - bzip2
+    - curl-devel 
+    - gcc-c++ 
+    - glibc
+    - make
+    - openssl-devel 
+    - patch 
+    - pcre
+    - sudo
+    - rsync
+
+
+
+

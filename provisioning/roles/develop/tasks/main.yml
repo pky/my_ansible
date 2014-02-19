@@ -1,0 +1,40 @@
+- name: all install
+  action: yum name=$item state=latest
+  with_items:
+    - autoconf 
+    - automake 
+    - bzip2
+    - bzip2-devel    
+    - curl-devel 
+    - gcc-c++ 
+    - glibc
+    - git
+    - libxml2 
+    - libxml2-devel 
+    - libxslt 
+    - libxslt-devel
+    - make
+    - openssl-devel 
+    - patch 
+    - pcre
+    - readline 
+    - readline-devel 
+    - sudo
+    - zlib 
+    - zlib-devel
+    - libyaml-devel
+    - xz
+    - xz-devel
+    - xz-lzma-compat
+    - neon
+    - ack
+    - screen
+    - htop
+    - unzip
+    - gettext
+    - bison
+    - git
+    - tig
+    
+
+

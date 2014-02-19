@@ -1,0 +1,215 @@
+---
+
+- name: yum install
+  action: yum name=$item state=present
+  with_items:
+    - curl
+    - net-snmp
+    - unixODBC
+    - OpenIPMI-libs
+    - vlgothic-p-fonts
+    - java-1.7.0
+  tags: zabbix-server
+
+- name: install rpmforge repo
+  yum: name=http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm state=present
+  tags: zabbix-server
+  
+- name: install iksemel
+  yum: pkg=iksemel.x86_64 state=present enablerepo=rpmforge
+  tags: zabbix-server
+  
+- name: install iksemel-devel
+  yum: pkg=iksemel.x86_64 state=present enablerepo=rpmforge
+  tags: zabbix-server
+  
+- name: install fping
+  yum: pkg=fping state=present enablerepo=rpmforge
+  tags: zabbix-server
+  
+- name: install libssh
+  yum: pkg=libssh state=present enablerepo=rpmforge
+  tags: zabbix-server
+
+# - name: install zbbix-repo
+#   yum: name=http://repo.zabbix.jp/relatedpkgs/rhel6/i386/zabbix-jp-release-6-6.noarch.rpm state=present
+#   tags: zabbix-server
+  
+- name: get dejavu-fonts-common
+  get_url: >
+      url=ftp://ftp.pbone.net/mirror/atrpms.net/el6-x86_64/atrpms/testing/dejavu-fonts-common-2.30-2.noarch.rpm
+      dest=${tmp}/dejavu-fonts-common-2.30-2.el6.noarch.rpm
+  tags: zabbix-server
+  
+- name: install dejavu-fonts-common
+  yum: name=${tmp}/dejavu-fonts-common-2.30-2.el6.noarch.rpm state=present
+  tags: zabbix-server
+  
+- name: get dejavu-sans-fonts
+  get_url: >
+      url=ftp://ftp.pbone.net/mirror/atrpms.net/el6-x86_64/atrpms/testing/dejavu-sans-fonts-2.30-2.noarch.rpm
+      dest=${tmp}/dejavu-sans-fonts-2.30-2.el6.noarch.rpm
+  tags: zabbix-server
+  
+- name: install dejavu-sans-fonts
+  yum: name=${tmp}/dejavu-sans-fonts-2.30-2.el6.noarch.rpm state=present
+  tags: zabbix-server
+  
+- name: get zabbix-agent
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-agent-${version}.el6.x86_64.rpm
+    dest=${tmp}/zabbix-agent-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: get zabbix server
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-server-${version}.el6.x86_64.rpm
+    dest=${tmp}/zabbix-server-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: get zabbix-server-mysql
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-server-mysql-${version}.el6.x86_64.rpm
+    dest=${tmp}/zabbix-server-mysql-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: get zabbix-web
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-web-${version}.el6.noarch.rpm
+    dest=${tmp}/zabbix-web-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: get zabbix-web-mysql
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-web-mysql-${version}.el6.noarch.rpm
+    dest=${tmp}/zabbix-web-mysql-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: get zabbix-web-japanese
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-web-japanese-${version}.el6.noarch.rpm
+    dest=${tmp}/zabbix-web-japanese-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: get zabbix-java-gateway
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-java-gateway-${version}.el6.x86_64.rpm
+    dest=${tmp}/zabbix-java-gateway-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: get zabbix
+  get_url: >
+    url=http://repo.zabbix.com/zabbix/2.2/rhel/6/x86_64/zabbix-${version}.el6.x86_64.rpm
+    dest=${tmp}/zabbix-${version}.el6.x86_64.rpm
+  tags: zabbix-server
+  
+- name: check zabbix install
+  command: ls /etc
+  register: etc
+  tags: zabbix-server
+  
+- name: install zabbix
+  command: >-
+    rpm -ivh /tmp/zabbix-${version}.el6.x86_64.rpm
+    /tmp/zabbix-agent-${version}.el6.x86_64.rpm
+    /tmp/zabbix-server-${version}.el6.x86_64.rpm
+    /tmp/zabbix-server-mysql-${version}.el6.x86_64.rpm
+    /tmp/zabbix-web-${version}.el6.x86_64.rpm
+    /tmp/zabbix-web-mysql-${version}.el6.x86_64.rpm
+    /tmp/zabbix-web-japanese-${version}.el6.x86_64.rpm
+    /tmp/zabbix-java-gateway-${version}.el6.x86_64.rpm
+  when: etc.stdout.find('zabbix') == -1
+  tags: zabbix-server
+  
+- name: Create zabbix database
+  mysql_db: >
+    name=${db_name}
+    state=present
+    encoding=utf8
+    login_user=root
+    login_password=${mysql_root_passwd}
+  tags: zabbix-server
+  
+- name: Create zabbix database user
+  mysql_user: >
+    login_user=root
+    login_password=${mysql_root_passwd}
+    priv=${db_name}.*:ALL
+    name=${db_user}
+    password=${db_password}
+  tags: zabbix-server
+  
+- name: check tables
+  command: |
+     mysql --connect-expired-password -uzabbix -p${db_password} -e "show tables from ${db_name}"
+  register: show_tables
+  tags: zabbix-server
+  
+- name: create tables
+  shell: |
+    mysql --connect-expired-password -uzabbix -p${db_password} zabbix < /usr/share/doc/zabbix-server-mysql-2.2.0/create/schema.sql &&
+    mysql --connect-expired-password -uzabbix -p${db_password} zabbix < /usr/share/doc/zabbix-server-mysql-2.2.0/create/images.sql &&
+    mysql --connect-expired-password -uzabbix -p${db_password} zabbix < /usr/share/doc/zabbix-server-mysql-2.2.0/create/data.sql 
+  when: show_tables.stdout.find("user_history") == -1
+  tags:
+    - table
+    - zabbix-server
+    
+- name: edit DBPassword
+  lineinfile: 
+    regexp='^DBPassword'
+    line='DBPassword = ${db_password}'
+    insertafter=EOF
+    state=present
+    dest=/etc/zabbix/zabbix_server.conf
+  tags: zabbix-server
+  
+- name: cp zabbix
+  command: cp -R /usr/share/zabbix /var/nginx/zabbix creates=/var/nginx/zabbix
+  tags: zabbix-server
+  
+- name: chmod 775 zabbix
+  command: chmod -R 775 /var/nginx/zabbix
+  tags: zabbix-server
+  
+- name: chmod 775 zabbix web
+  command: chmod -R 775 /etc/zabbix/web/  
+  tags: zabbix-server
+  
+- name: chown zabbix web nginx:wheel
+  command: chown -R nginx:wheel /etc/zabbix/web/
+  tags: zabbix-server
+  
+- name: chown nginx:wheel
+  command: chown -R nginx:wheel /var/nginx/zabbix
+  tags: zabbix-server
+  
+- name: copy zabbix.conf
+  copy: src=zabbix.conf dest=/etc/nginx/conf.d/zabbix.conf
+  tags:
+    - conf
+    - zabbix-server
+
+- name: zabbix-server config file
+  template: >
+    src=zabbix_server.conf.j2
+    dest=/etc/zabbix/zabbix_server.conf
+    owner=zabbix
+    group=zabbix
+    mode=0644
+  tags: zabbix-server
+  
+- name: copy default.conf
+  copy: src=default.conf dest=/etc/nginx/conf.d/default.conf
+  tags:
+    - conf
+    - zabbix-server
+
+- name: start zabbix-server service
+  service: name=zabbix-server state=started enabled=yes
+  tags: zabbix-server
+
+- name: start zabbix-java-gateway service
+  service: name=zabbix-java-gateway state=started enabled=yes
+  tags: zabbix-server
+  

@@ -1,0 +1,19 @@
+- hosts: all
+  user: pky
+  sudo: true
+  roles:
+    - hosts
+    - ssh
+    - iptables    
+    - common
+
+- hosts: server
+  user: pky
+  sudo: true
+  roles:
+    - mysql
+    - nginx
+    - php-fpm
+    - zabbix-server
+    - reboot
+    

@@ -1,0 +1,7 @@
+/var/log/xtrabackup.log {
+    weekly
+    create 0666
+    rotate 4
+	missingok
+}
+

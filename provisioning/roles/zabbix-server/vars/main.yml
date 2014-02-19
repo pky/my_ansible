@@ -1,0 +1,9 @@
+---
+
+version: 2.2.0-1
+db_user: zabbix
+db_name: zabbix
+db_password: zabbix_pass
+cache_size: 8M
+
+

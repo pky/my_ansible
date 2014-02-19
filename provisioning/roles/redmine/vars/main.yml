@@ -1,0 +1,3 @@
+db_name: redmine
+db_user: redmine
+db_password: redmine_passwd

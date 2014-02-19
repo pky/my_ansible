@@ -1,0 +1,47 @@
+- name: install gpg
+  yum: name=gpg state=present
+  tags: xtrabackup
+  
+- name: install pbzip2
+  yum: name=pbzip2 state=present
+  tags: xtrabackup
+  
+- name: get XtrapBackup rpm
+  get_url: >
+      url=http://www.percona.com/redir/downloads/XtraBackup/LATEST/RPM/rhel6/x86_64/percona-xtrabackup-2.1.6-702.rhel6.x86_64.rpm
+      dest=/tmp/percona-xtrabackup-2.1.6-702.rhel6.x86_64.rpm
+  tags: xtrabackup
+
+- name: install XtraBackup
+  yum: name=/tmp/percona-xtrabackup-2.1.6-702.rhel6.x86_64.rpm state=present
+  tags: xtrabackup
+
+- name: mkdir {{ backup_dir }}/batch
+  file: path={{ backup_dir }}/batch owner={{ user }} state=directory mode=755
+  tags: xtrabackup   
+
+- name: mkdir {{ backup_dir }}/rdb
+  file: path=/data/backup/rdb owner={{ user }} state=directory mode=755
+  tags: xtrabackup   
+   
+- name: copy xtrabackup.sh
+  template: >
+    src=xtrabackup.sh.j2
+    dest={{ backup_dir }}/batch/xtrabackup.sh
+    owner={{ user }}
+    group={{ user }}
+    mode=0755
+  tags: xtrabackup
+
+- name: set /var/log/xtrabackup.log
+  copy: src=xtrabackup.log dest=/var/log/xtrabackup.log mode=0666
+  tags: xtrabackup  
+
+- name: set logrotate.d/xtrabackup
+  copy: src=xtrabackup dest=/etc/logrotate.d/xtrabackup
+  tags: xtrabackup  
+
+- name: set cron xtrabackup
+  cron: name="xtrabackup" minute="00" hour="7" job="/data/backup/batch/xtrabackup.sh >> /var/log/xtrabackup.log 2>&1" user="root"
+  tags: xtrabackup
+

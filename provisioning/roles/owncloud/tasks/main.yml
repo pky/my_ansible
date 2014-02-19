@@ -1,0 +1,145 @@
+---
+
+- name: install php-cli
+  yum: pkg=php-cli state=present enablerepo=remi
+
+- name: install php-pdo
+  yum: pkg=php-pdo state=present enablerepo=remi
+
+- name: install php-pear-MDB2
+  yum: pkg=php-pear-MDB2 state=present enablerepo=remi
+
+- name: install php-pear-MDB2-Driver-mysqli
+  yum: pkg=php-pear-MDB2-Driver-mysqli state=present enablerepo=remi
+
+- name: install php-pear-Net-Curl
+  yum: pkg=php-pear-Net-Curl state=present enablerepo=remi
+
+- name: install php-process
+  yum: pkg=php-process state=present enablerepo=remi
+
+- name: create ownCloud repository file
+  copy: src=isv:ownCloud:community.repo dest=/etc/yum.repos.d/isv:ownCloud:community.repo
+
+- name: install owncloud key
+  command: rpm --import http://download.opensuse.org/repositories/isv:/ownCloud:/community/CentOS_CentOS-6/repodata/repomd.xml.key
+
+- name: install owncloud
+  yum: name=owncloud state=present enablerepo=isv_ownCloud_community
+
+- name: chown nginx:staff owncloud
+  shell: chmod -R 775 /var/www/html/owncloud
+  tags: chmod
+  
+- name: chown nginx:nginx owncloud
+  shell: chown -R nginx:nginx /var/www/html/owncloud
+  tags: chmod
+  
+- name: copy nginx:owncloud.conf
+  template: >
+    src=nginx.conf.j2
+    dest=/etc/nginx/conf.d/owncloud.conf
+    owner=root
+    group=root
+    mode=0644
+  tags: nginx_conf
+
+- name: edit post_max_size
+  lineinfile: 
+    regexp='^post_max_size'
+    line='post_max_size = 50G'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+
+- name: edit upload_max_filesize
+  lineinfile: 
+    regexp='^upload_max_filesize'
+    line='upload_max_filesize = 5G'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+  
+- name: edit max_file_uploads
+  lineinfile: 
+    regexp='^max_file_uploads'
+    line='max_file_uploads = 200'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+
+- name: edit max_input_time
+  lineinfile: 
+    regexp='^max_input_time'
+    line='max_input_time = 3600'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+    
+- name: edit max_execution_time
+  lineinfile: 
+    regexp='^max_execution_time'
+    line='max_execution_time = 3600'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+    
+- name: edit session.gc_maxlifetime
+  lineinfile: 
+    regexp='^session.gc_maxlifetime'
+    line='session.gc_maxlifetime = 3600'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+    
+- name: edit memory_limit
+  lineinfile: 
+    regexp='^memory_limit'
+    line='memory_limit = 512M'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+
+- name: edit typezone
+  lineinfile: 
+    regexp='^date.timezone'
+    line='date.timezone = Asia/Tokyo'
+    insertafter=EOF
+    state=present
+    dest=/etc/php.ini
+
+- name: create server.key
+  shell: openssl genrsa 2048 > /etc/pki/tls/certs/server.key
+  tags: ssl
+
+- name: create server.crt
+  command: >
+    openssl req -new -x509 -days 3650 
+    -key /etc/pki/tls/certs/server.key
+    -out /etc/pki/tls/certs/server.crt 
+    -subj '/CN={{ server_name }}' 
+#    creates=/etc/pki/tls/certs/server.crt
+  tags: ssl
+
+- name: Create owncloud databases
+  mysql_db: >
+    name={{ db_name }}
+    state=present
+    encoding=utf8
+    login_user=root
+    login_password={{ mysql_root_passwd }}
+  tags: owncloud
+  
+- name: Create owncloud database user
+  mysql_user: >
+    login_user=root
+    login_password={{ mysql_root_passwd }}
+    priv={{ db_name }}.*:ALL
+    name={{ db_user }}
+    password={{ db_password }}
+  tags: owncloud
+  
+
+- name: restart nginx service
+  service: name=nginx state=restarted enabled=yes
+  tags: nginx_conf

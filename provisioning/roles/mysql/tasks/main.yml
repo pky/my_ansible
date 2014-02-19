@@ -1,0 +1,67 @@
+---
+
+- name: get MySQL-shared-compat
+  get_url: >
+    url=http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-shared-compat-{{ mysql_version }}.el6.x86_64.rpm
+    dest=${tmp}/MySQL-shared-compat-${mysql_version}.el6.x86_64.rpm
+
+- name: get MySQL-devel
+  get_url: >
+    url=http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-devel-{{ mysql_version }}.el6.x86_64.rpm
+    dest=${tmp}/MySQL-devel-${mysql_version}.el6.x86_64.rpm
+
+- name: get MySQL-client
+  get_url: >
+    url=http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-client-{{ mysql_version }}.el6.x86_64.rpm
+    dest=${tmp}/MySQL-client-${mysql_version}.el6.x86_64.rpm
+
+- name: get MySQL-server
+  get_url: >
+    url=http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-server-{{ mysql_version }}.el6.x86_64.rpm
+    dest=${tmp}/MySQL-server-${mysql_version}.el6.x86_64.rpm
+
+- name: get MySQL-shared
+  get_url: >
+    url=http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-shared-{{ mysql_version }}.el6.x86_64.rpm
+    dest=${tmp}/MySQL-shared-${mysql_version}.el6.x86_64.rpm
+
+- name: install MySQL-shared-compat
+  yum: name=${tmp}/MySQL-shared-compat-${mysql_version}.el6.x86_64.rpm state=present
+
+- name: install MySQL-devel
+  yum: name=${tmp}/MySQL-devel-${mysql_version}.el6.x86_64.rpm state=present
+
+- name: install MySQL-client
+  yum: name=${tmp}/MySQL-client-${mysql_version}.el6.x86_64.rpm state=present
+
+- name: install MySQL-shared
+  yum: name=${tmp}/MySQL-shared-${mysql_version}.el6.x86_64.rpm state=present
+
+- name: install MySQL-server
+  yum: name=${tmp}/MySQL-server-${mysql_version}.el6.x86_64.rpm state=present
+  
+- name: copy my.cnf file
+  copy: src=my.cnf dest=/etc/my.cnf
+
+- name: start mysql service
+  service: name=mysql state=restarted enabled=yes
+
+- name: be sure mysqldb is installed
+  yum: pkg=MySQL-python state=installed
+
+- name: password
+  shell: cat /root/.mysql_secret | awk '{ print $NF }'
+  register: mysql_passwd
+
+- name: check MySQL root password
+  shell: mysqlshow -uroot -p{{ mysql_passwd.stdout }}
+  register: root_check
+  ignore_errors: yes
+
+- name: set MySQL root password
+  command: |
+     mysql --connect-expired-password -uroot -p{{ mysql_passwd.stdout }} -e
+     "set password for root@'{{ item }}' = PASSWORD('{{mysql_root_passwd}}')" creates=/root/.my.cnf
+  with_items:
+     - localhost
+  when: root_check.stderr.find('deniend') != -1 or root_check.stderr.find('expired.') != -1

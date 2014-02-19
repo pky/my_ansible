@@ -1,0 +1,37 @@
+
+- name: edit sshd_config (PasswordAuthentication)
+  lineinfile: 
+    regexp='^PasswordAuthentication'
+    line='PasswordAuthentication no'
+    insertafter=EOF
+    state=present
+    dest=/etc/ssh/sshd_config
+
+- name: edit sshd_config (ChallengeResponseAuthentication)
+  lineinfile: 
+    regexp='^ChallengeResponseAuthentication'
+    line='ChallengeResponseAuthentication no'
+    insertafter=EOF
+    state=present
+    dest=/etc/ssh/sshd_config
+
+- name: edit sshd_config (PermitRootLogin)
+  lineinfile: 
+    regexp='^PermitRootLogin'
+    line='PermitRootLogin no'
+    insertafter=EOF
+    state=present
+    dest=/etc/ssh/sshd_config
+
+- name: mkdir .ssh
+  file: path=/home/${user}/.ssh owner=${user} group=${user} mode=700 state=directory
+
+- name: copy /home/user/.ssh/config
+  copy: src=config owner=${user} group=${user} mode=600 dest=/home/${user}/.ssh/config
+
+- name: copy /home/user/.ssh/id_rsa
+  copy: src=id_rsa owner=${user} group=${user} mode=600 dest=/home/${user}/.ssh/id_rsa
+
+- name: copy authorized_keys
+  copy: src=authorized_keys dest=/home/${user}/.ssh/authorized_keys mode=600 owner=${user} group=${user}
+    

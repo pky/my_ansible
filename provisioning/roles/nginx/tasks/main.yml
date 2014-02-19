@@ -1,0 +1,50 @@
+---
+
+- name: install nginx repo
+  yum: name=http://nginx.org/packages/rhel/6/noarch/RPMS/nginx-release-rhel-6-0.el6.ngx.noarch.rpm  state=present
+  tags: nginx
+  ignore_errors: yes
+  
+- name: install nginx
+  yum: pkg=nginx state=present enablerepo=nginx
+  tags: nginx
+  
+- name: copy nginx.conf
+  copy: src=nginx.conf dest=/etc/nginx/nginx.conf
+  tags:
+    - conf
+    - nginx
+
+- name: copy default.conf
+  copy: src=default.conf dest=/etc/nginx/conf.d/default.conf
+  tags:
+    - conf
+    - nginx
+
+- name: mkdir /var/nginx
+  file: path=/var/nginx owner=nginx group=wheel state=directory mode=775
+  tags: nginx
+
+- name: chown /var/cache/nginx nginx:wheel
+  command: chown -R nginx:wheel /var/cache/nginx
+  tags: nginx
+
+- name: chmod 775 /var/cache/nginx
+  command: chmod -R 775 /var/cache/nginx
+  tags: nginx
+
+- name: mkdir /var/run/nginx
+  file: path=/var/run/nginx owner=nginx group=wheel state=directory mode=775
+  tags: nginx
+
+- name: stop nginx service
+  shell: pkill -f nginx
+  ignore_errors: yes
+  tags: nginx
+  
+- name: start nginx service
+  service: name=nginx enabled=yes state=started
+  tags: nginx
+
+  
+  
