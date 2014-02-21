@@ -1,7 +1,6 @@
 127.0.0.1   localhost localhost.localdomain
 ::1         localhost localhost.localdomain
 
-172.17.5.11 zabbix-agent
-172.17.1.11 bid01
-172.17.11.11 zabbix-server
+172.10.0.1 zabbix-agent
+172.10.0.11 zabbix-server
 

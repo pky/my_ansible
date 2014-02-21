@@ -7,7 +7,7 @@ IPT=/sbin/iptables
 LOCAL_DEV=eth1
 
 #バックセグメント
-#BACK_SEG=172.17.0.0/16
+#BACK_SEG=172.10.0.0/16
 
 /etc/rc.d/init.d/iptables stop
 
