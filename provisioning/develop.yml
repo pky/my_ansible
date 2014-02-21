@@ -2,6 +2,7 @@
   user: pky
   sudo: true
   roles:
-    - ssh
-    - ntp
+    - emacs
+    - zsh
+    - screen
     
