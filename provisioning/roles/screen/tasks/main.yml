@@ -1,0 +1,5 @@
+---
+- name: install screen
+  yum: pkg=screen state=present
+  tags: screen
+
