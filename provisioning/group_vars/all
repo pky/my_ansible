@@ -2,12 +2,13 @@
 
 redmine_version: 2.4.1
 ruby_version: 2.0.0-p353
-zsh_version: 5.0.2
+zsh_version: 5.0.5
 emacs_version: 24.3
 mysql_version: 5.7.3_m13-1
 tmp: /tmp
 mysql_root_passwd: passwd
-user: pky
+user: fractale
+home_dir: /home/fractale
 
 
 

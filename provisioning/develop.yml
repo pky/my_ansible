@@ -2,7 +2,9 @@
   user: pky
   sudo: true
   roles:
+    - git
     - emacs
     - zsh
     - screen
+    - dotfiles
     

@@ -9,6 +9,7 @@
     - gcc-c++ 
     - glibc
     - git
+    - bc
     - libxml2 
     - libxml2-devel 
     - libxslt 

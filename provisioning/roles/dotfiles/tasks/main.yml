@@ -1,0 +1,18 @@
+---
+
+# 
+- git: repo=https://github.com/pky/dotfiles.git dest={{ home_dir }}/dotfiles
+
+- file: path={{ home_dir }}/dotfiles owner={{ user }} group={{ user }} mode=0700
+
+# .zshrc  
+- file: src={{ home_dir }}/dotfiles/.zshrc dest={{ home_dir }}/.zshrc owner={{ user }} group={{ user }} state=link
+
+# .screenrc
+- file: src={{ home_dir }}/dotfiles/.screenrc dest={{ home_dir }}/.screenrc owner={{ user }} group={{ user }} state=link
+
+# .gitignore
+- file: src={{ home_dir }}/dotfiles/.gitignore dest={{ home_dir }}/.gitignore owner={{ user }} group={{ user }} state=link
+
+# .gitconfig
+- file: src={{ home_dir }}/dotfiles/.gitconfig dest={{ home_dir }}/.gitconfig owner={{ user }} group={{ user }} state=link

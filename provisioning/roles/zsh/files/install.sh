@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZSHVERSION=5.0.2
+ZSHVERSION=5.0.5
 INSTALL_ZSH="yes"
 
 if [ $# -ge 1 ]; then
@@ -15,8 +15,9 @@ if [ -e /usr/local/bin/zsh ]; then
 fi
 
 if [ $INSTALL_ZSH = "yes" ]; then
-cd $TMPDIR
+cd /tmp
 wget http://sourceforge.net/projects/zsh/files/zsh/$ZSHVERSION/zsh-$ZSHVERSION.tar.gz/download
+mv download zsh-$ZSHVERSION.tar.gz
 tar xf zsh-$ZSHVERSION.tar.gz
 cd zsh-$ZSHVERSION
 ./configure --prefix=/usr/local
@@ -27,7 +28,7 @@ echo "/usr/local/bin/zsh" >> /etc/shells
 sudo chmod 644 /etc/shells
 chsh -s /usr/local/bin/zsh $INSTALLUSER
 
-cd $TMPDIR
+cd /tmp
 rm -f zsh-$ZSHVERSION.tar.gz
 rm -rf zsh-$ZSHVERSION
 fi
