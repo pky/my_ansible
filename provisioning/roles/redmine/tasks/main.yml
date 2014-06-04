@@ -100,7 +100,7 @@
   file: path=/var/lib/redmine/tmp owner=nginx group=wheel state=directory mode=777
 
 - name: chmod 666 log/production.log
-  file: path=/var/lib/redmine/log/production.log owner=nginx group=wheel state=directory mode=666
+  file: path=/var/lib/redmine/log/production.log owner=nginx group=wheel state=file mode=666
 
 - name: mkdir /var/log/unicorn
   file: path=/var/log/unicorn owner=nginx group=wheel state=directory mode=775
