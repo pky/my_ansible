@@ -1,0 +1,5 @@
+---
+- name: install zsh
+  homebrew: pkg=zsh state=latest
+  tags: zsh
+

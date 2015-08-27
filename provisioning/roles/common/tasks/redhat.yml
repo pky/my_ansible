@@ -1,0 +1,75 @@
+
+- name: install libselinux-python
+  yum: name=libselinux-python
+  ignore_errors: yes
+
+- name: selinux desabled
+  selinux: state=disabled
+  ignore_errors: yes  
+
+- name: set net.nf_conntrack_max = 1000000
+  sysctl: name=net.nf_conntrack_max value=1000000 state=present reload=yes
+  ignore_errors: yes  
+  
+- name: copy /etc/security/limits.d/90-nproc.conf
+  copy: src=90-nproc.conf dest=/etc/security/limits.d/90-nproc.conf
+  ignore_errors: yes  
+
+- name: add ulimit -u /etc/sysconfig/init
+  lineinfile: dest=/etc/sysconfig/init
+              regexp="ulimit -u"
+              value="ulimit -u 65535"
+              insertafter=EOF
+              state=present
+  ignore_errors: yes              
+
+- name: add ulimit -n /etc/sysconfig/init
+  lineinfile: dest=/etc/sysconfig/init
+              regexp="ulimit -n"
+              value="ulimit -n 65535"
+              insertafter=EOF
+              state=present
+  ignore_errors: yes              
+
+- name: user add wheel group
+  command: usermod -G wheel {{user}}
+  ignore_errors: yes    
+  
+- name: edit /etc/pam.d/su
+  lineinfile: dest=/etc/pam.d/su
+              regexp="#auth\s+required\s+pam_wheel.so use_uid"
+              value="auth required pam_wheel.so use_uid"
+              insertafter=EOF
+              state=present
+              
+- name: check epel repository is installed
+  shell: rpm -q epel-release > /dev/null; echo $?
+  register: result
+  changed_when: False
+  ignore_errors: yes  
+
+- name: install epel repository
+  yum: name=http://ftp.riken.jp/Linux/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm state=present
+
+- name: install epel key
+  command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+
+- name: all install
+  action: yum name=$item state=present
+  with_items:
+    - autoconf 
+    - automake 
+    - bzip2
+    - curl-devel 
+    - gcc-c++ 
+    - glibc
+    - make
+    - openssl-devel 
+    - patch 
+    - pcre
+    - sudo
+    - rsync
+
+
+
+

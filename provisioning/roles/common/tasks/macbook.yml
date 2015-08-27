@@ -1,0 +1,62 @@
+- name: install homebrew_tap
+  action: homebrew_tap name={{item}} state=present
+  with_items:
+    - homebrew/binary
+    - homebrew/dupes
+    - caskroom/cask
+
+- name: update homebrew
+  homebrew: update_homebrew=yes
+
+- name: homebrew install
+  action: homebrew name={{item}} state=latest
+  with_items:
+      - readline
+      - openssl
+      - python
+      - ansible
+      - coreutils
+      - git
+      - git-flow
+      - zsh
+      - wget
+      - cmake
+      - autoconf
+      - automake
+      - ack
+      - ag
+      - ctags
+      - nkf
+      - tig
+      - rbenv
+      - nodebrew
+      - ruby-build
+      - mysql
+      - imagemagick
+      - packer
+      - xz
+      - gnu-tar
+
+- name: Install Homebrew cask apps
+  action: homebrew_cask name={{item}} state=present
+  environment:
+    HOMEBREW_CASK_OPTS: --appdir=/Applications
+  with_items:
+    - firefox
+    - google-chrome
+    - google-japanese-ime
+    - adobe-reader
+    - adobe-creative-cloud
+    - java
+    - skype
+    - slack
+    - sourcetree
+    - cornerstone
+    - dash
+    - intellij-idea
+    - appcode
+    - android-studio
+    - androidtool
+    - fabric
+    - vagrant
+    - virtualbox
