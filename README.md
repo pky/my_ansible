@@ -14,7 +14,7 @@ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/
 #ansible install
 brew update
 brew install ansible
-``
+```
 
 
 
