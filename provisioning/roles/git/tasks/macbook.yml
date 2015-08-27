@@ -1,0 +1,5 @@
+---
+- name: install git
+  homebrew: pkg=git state=latest
+  tags: git
+

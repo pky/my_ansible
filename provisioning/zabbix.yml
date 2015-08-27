@@ -4,7 +4,7 @@
   roles:
     - hosts
     - ssh
-    - iptables    
+    - iptables
     - common
 
 - hosts: server

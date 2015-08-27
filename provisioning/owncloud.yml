@@ -2,7 +2,7 @@
   user: pky
   sudo: true
   roles:
-    - iptables    
+    - iptables
     - common
 
 - hosts: server
@@ -14,4 +14,3 @@
     - spawn-fcgi
     - owncloud
     - reboot
-    
