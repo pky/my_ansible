@@ -3,6 +3,21 @@ ansible
 
 my ansible playbooks
 
+** start
+```
+# install xcode
+sudo xcodebuild -license
+
+#install homebrew
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+#ansible install
+brew update
+brew install ansible
+``
+
+
+
 ```
 ansible -m setup -i inventory/dev all -K -vvvv
 ```
