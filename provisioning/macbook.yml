@@ -6,3 +6,5 @@
     emacs_ver: 24.5
   roles:
     - common
+    - grip
+

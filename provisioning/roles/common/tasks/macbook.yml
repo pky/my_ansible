@@ -60,3 +60,9 @@
     - fabric
     - vagrant
     - virtualbox
+
+
+- name: install pip
+  command: >
+    python get-pip.py
+  sudo: no
