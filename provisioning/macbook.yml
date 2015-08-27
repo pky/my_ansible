@@ -1,0 +1,8 @@
+- hosts: all
+  connection: local
+  user: ikeda_eiji
+  sudo: no
+  vars:
+    emacs_ver: 24.5
+  roles:
+    - emacs

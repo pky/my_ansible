@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EMACSVERSION=24.3
+EMACSVERSION=24.5
 
 #emacs
 if [ -e /usr/local/bin/emacs ]; then

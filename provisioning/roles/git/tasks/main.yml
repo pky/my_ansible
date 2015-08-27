@@ -1,5 +1,6 @@
 ---
-- name: install git
-  yum: pkg=git state=present
-  tags: git
+- include: redhat.yml
+  when: "ansible_os_family == 'RedHat'"
 
+- include: macbook.yml
+  when: "ansible_os_family == 'Darwin'"

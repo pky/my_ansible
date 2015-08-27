@@ -1,0 +1,57 @@
+---
+- name: homebrew install
+  action: homebrew name={{item.name}} state=latest install_options={{item.options|default()}}
+  with_items:
+    - {name: 'autoconf'}
+    - {name: 'automake'}
+    - {name: 'cmake'}
+    - {name: 'xz'}
+    - {name: 'gnu-tar'}
+
+- name: get emacs
+  get_url: >
+    url="http://ftp.gnu.org/pub/gnu/emacs/emacs-{{emacs_ver}}.tar.xz"
+    dest=~/Downloads
+  sudo: no
+  
+- name: unarvhice
+  command: >
+    gtar xfJ ~/Downloads/emacs-{{emacs_ver}}.tar.xz -C ~/Downloads
+    creates=~/Downloads/emacs-{{emacs_ver}}
+  sudo: no
+  
+- name: patch download
+  git: repo=git@gist.github.com:1d91107b311b63b57529.git dest=~/Downloads/inline
+  sudo: no
+  
+- name: patch set
+  command: >
+    cd ~/Downloads/emacs-{{emacs_ver}}
+    patch -p1 < ~/Downloads/inline/emacs-{{emacs_ver}}-inline.patch
+  sudo: no
+  
+- name: configure
+  command: >
+    ./configure
+    --with-ns --without-x
+    chdir=~/Downloads/emacs-{{emacs_ver}}
+    creates=/Applications/Emacs.{{emacs_ver}}.app
+  sudo: no
+
+- name: make bootstrap
+  command: make bootstrap chdir=~/Downloads/emacs-{{emacs_ver}} creates=/Applications/Emacs.{{emacs_ver}}.app
+  sudo: no
+    
+- name: make install
+  command: make install chdir=~/Downloads/emacs-{{emacs_ver}} creates=/Applications/Emacs.{{emacs_ver}}.app
+
+- name: cp -R Applications/Emacs.app
+  command: >
+    cp -R ~/Downloads/emacs-{{emacs_ver}}/nextstep/Emacs.app /Applications/Emacs.{{emacs_ver}}.app
+    creates=/Applications/Emacs.{{emacs_ver}}.app
+  sudo: no
+
+- name: set .emacs.d
+  git: repo=git://github.com/pky/emacs.d.git dest=~/.emacs.d clone=yes update=no
+  sudo: no
+  

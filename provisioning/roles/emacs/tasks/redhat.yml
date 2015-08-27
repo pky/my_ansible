@@ -1,0 +1,42 @@
+---
+- name: yum install
+  action: yum name=$item state=present
+  with_items:
+    - autoconf
+    - automake
+    - git
+    - xz
+    - ncurses
+    - ncurses-devel
+    - ghc-terminfo-devel
+    - compat-libtermcap
+
+- name: get emacs
+  get_url: >
+    url=http://ftp.gnu.org/pub/gnu/emacs/emacs-${emacs_version}.tar.xz
+    dest={{tmp}}/emacs-${emacs_version}.tar.xz
+  sudo: no
+  
+- name: unarvhice
+  command: tar xf {{tmp}}/emacs-${emacs_version}.tar.xz -C {{tmp}} creates=/tmp/emacs-${emacs_version}
+  sudo: no
+  
+- name: configure
+  command: >
+    ./configure
+    --without-x
+    chdir={{tmp}}/emacs-${emacs_version}
+    creates=/usr/local/bin/emacs
+  sudo: no    
+    
+- name: make
+  command: make chdir={{tmp}}/emacs-${emacs_version} creates=/usr/local/bin/emacs
+  sudo: no  
+    
+- name: make install
+  command: make install chdir={{tmp}}/emacs-${emacs_version} creates=/usr/local/bin/emacs
+
+- name: set .emacs.d
+  git: repo=git://github.com/pky/emacs.d.git dest=/home/{{user}}/.emacs.d
+  sudo: no
+  
