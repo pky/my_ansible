@@ -1,0 +1,5 @@
+---
+- name: install grip #$ grip README.md localhsot:6419/README.md joeyespo/grip
+  pip: name=grip state=present
+  tags: grip
+
