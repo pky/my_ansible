@@ -1,0 +1,10 @@
+---
+- name: install wget
+  yum: pkg=wget state=present
+
+- name: copy install.sh
+  copy: src=install.sh dest=/tmp/install.sh owner=fractale group=wheel mode=775
+
+- name: install ruby
+  command: sh /tmp/install.sh {{zsh_version}} creates=/usr/local/bin/zsh
+
