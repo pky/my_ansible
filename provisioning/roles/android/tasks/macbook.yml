@@ -1,0 +1,27 @@
+- name: install homebrew_tap
+  action: homebrew_tap name={{item}} state=present
+  with_items:
+    - homebrew/binary
+    - homebrew/dupes
+    - caskroom/cask
+
+- name: update homebrew
+  homebrew: update_homebrew=yes
+
+- name: homebrew install
+  action: homebrew name={{item}} state=latest
+  with_items:
+      - git
+      - git-flow
+
+- name: Install Homebrew cask apps
+  action: homebrew_cask name={{item}} state=present
+  environment:
+    HOMEBREW_CASK_OPTS: --appdir=/Applications
+  with_items:
+    - java7
+    - android-studio
+    - androidtool
+
+- name: set Java home
+  shell: echo 'export JAVA_HOME=`/usr/libexec/java_home -v 1.7`' >> {{ ansible_env.HOME }}/.zshrc
