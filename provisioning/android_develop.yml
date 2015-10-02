@@ -1,0 +1,9 @@
+- hosts: all
+  connection: local
+  user: ikeda_eiji
+  sudo: no
+  vars:
+  roles:
+    - android
+
+
